@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  dotnet_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "mcr.microsoft.com/dotnet/sdk:6.0"
+        WORKDIR: "/src"
+        COPY_SRC: "./SampleWebApplication/SampleWebApplication.csproj"
+        COPY_DEST: "./"
+        BUILD_STAGE: "dotnet"
+        BUILD_COMMAND: "dotnet restore && dotnet build -c Release"
+        CMD_COMMAND: "dotnet run"
+    container_name: dotnet_app
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "node:19"
+        WORKDIR: "/src"
+        INSTALL_COMMAND: "npm install"
+        COPY_SRC: "./"
+        COPY_DEST: "./"
+        BUILD_COMMAND: "npm run build"
+        CMD_COMMAND: "npm start"
+    container_name: node_app
+
+  python_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "python:3.10.9-alpine3.17"
+        WORKDIR: "/home/worker"
+        INSTALL_COMMAND: "pip install --user -r requirements.txt"
+        COPY_SRC: "./requirements.txt"
+        COPY_DEST: "./requirements.txt"
+        CMD_COMMAND: "python app_routes.py"
+    container_name: python_app
